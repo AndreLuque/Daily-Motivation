@@ -7,7 +7,7 @@ def sendMessageTwilio(text: T, user_number: str) -> NoReturn:
 
 	#primero inicializamos nuestros credenciales
 	account_sid = 'AC79f4fb318d07f76a17b23a56573bd04a' 
-	auth_token = 'd57039635ba8428faf2b4872013c667a'
+	auth_token = '*********************************'
 	#creamos el cliente 
 	client: Client = Client(account_sid, auth_token)
 
