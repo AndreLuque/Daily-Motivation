@@ -55,54 +55,65 @@ class MainWindow(QMainWindow):
 		login.clicked.connect(lambda: self.__change_to_start_screen())
 
 	def __change_to_start_screen(self):
-	
+		#establecemos como se van a distribuir los widgets
 		layout = QVBoxLayout()
-				
+		
+		#ponemos el titulo de la pagina
 		title = QLabel('Let´s Start')
 		title.setStyleSheet('color : white; font-size : 50px; font-weight: bold')		
 		layout.addWidget(title)
 				
-		#dejamos un hueco para introducir el email
+		#dejamos un hueco para introducir el numero
 		self.enterNumber = QLineEdit(placeholderText = 'Enter Whatsapp Phone Number (Example: +34633890056)')
 		self.enterNumber.setStyleSheet('background-color : white; color : black')
 		layout.addWidget(self.enterNumber)
 
+		#dejamos un hueco para introducir la hora
 		self.time = QLineEdit(placeholderText = 'At what time do you want to recieve the quotes? (Example: 12:42)')
 		self.time.setStyleSheet('background-color : white; color : black')
+		self.time.setMaxLength(5)
 		layout.addWidget(self.time)
 
-		checkboxLabel = QLabel('Select Categories that you are interested in:')
-		checkboxLabel.setStyleSheet('color : white; font-size : 20px')
-		layout.addWidget(checkboxLabel)
-
+		self.__checkboxLabel = QLabel('Select Categories that you are interested in:')
+		self.__checkboxLabel.setStyleSheet('color : white; font-size : 20px')
+		layout.addWidget(self.__checkboxLabel)
 
 		sublayout1 = QHBoxLayout()
 
-		checkbox1 = QCheckBox('Inspirational')
-		checkbox1.setStyleSheet('color : white')
-		sublayout1.addWidget(checkbox1)
-		checkbox2 = QCheckBox('Sports')
-		checkbox2.setStyleSheet('color : white')
-		sublayout1.addWidget(checkbox2)
-		checkbox3 = QCheckBox('Love')
-		checkbox3.setStyleSheet('color : white')
-		sublayout1.addWidget(checkbox3)
+		#el usuario pulsara en las cajas que cumple su preferencia
+		self.__checkbox1 = QCheckBox('Inspirational')
+		self.__checkbox1.setStyleSheet('color : white')
+		sublayout1.addWidget(self.__checkbox1)
+		self.__checkbox2 = QCheckBox('Sports')
+		self.__checkbox2.setStyleSheet('color : white')
+		sublayout1.addWidget(self.__checkbox2)
+		self.__checkbox3 = QCheckBox('Love')
+		self.__checkbox3.setStyleSheet('color : white')
+		sublayout1.addWidget(self.__checkbox3)
 		layout.addLayout(sublayout1)
 
 		sublayout2 = QHBoxLayout()
 
-		checkbox4 = QCheckBox('Life')
-		checkbox4.setStyleSheet('color : white')
-		sublayout2.addWidget(checkbox4)
-		checkbox5 = QCheckBox('Funny')
-		checkbox5.setStyleSheet('color : white')
-		sublayout2.addWidget(checkbox5)
-		checkbox6 = QCheckBox('Students')
-		checkbox6.setStyleSheet('color : white')
-		sublayout2.addWidget(checkbox6)
+		self.__checkbox4 = QCheckBox('Life')
+		self.__checkbox4.setStyleSheet('color : white')
+		sublayout2.addWidget(self.__checkbox4)
+		self.__checkbox5 = QCheckBox('Funny')
+		self.__checkbox5.setStyleSheet('color : white')
+		sublayout2.addWidget(self.__checkbox5)
+		self.__checkbox6 = QCheckBox('Students')
+		self.__checkbox6.setStyleSheet('color : white')
+		sublayout2.addWidget(self.__checkbox6)
 		layout.addLayout(sublayout2)
 
-		layout.addWidget(QWidget())		
+		#widget flaso de relleno
+		layout.addWidget(QWidget())
+
+		#boton para continuar
+		continueButton = QPushButton('Continue')
+		continueButton.setStyleSheet('background-color : lime')
+		layout.addWidget(continueButton)
+
+		#ponemos widgets falsos de relleno		
 		layout.addWidget(QWidget())		
 
 
@@ -113,7 +124,44 @@ class MainWindow(QMainWindow):
 		self.setCentralWidget(centralWidget)	
 
 		#cuando el boton sea pulsado de conectara a esta funcion
-		login.clicked.connect(lambda: self.__QRcode())	
+		continueButton.clicked.connect(lambda: self.__check_start_screen())
+
+	def __check_start_screen(self):
+		numberText = self.enterNumber.text()
+		timeText = self.time.text()
+
+		#para ver si lo introducido en la casilla es un telefono
+		try:
+			numberTextInt = int(numberText[1:])
+		except:
+			numberTextInt = numberText[1:]	
+		#para ver si la hora es correcta
+		try:
+			timeTextInt = int(timeText[0:2] + timeText[3:])
+		except:
+			timeTextInt = timeText[0:2] + timeText[3:]		
+
+		check1: bool = True
+		if len(numberText) == 0 or numberText[0] != '+' or type(numberTextInt) == str:
+			self.enterNumber.setText('')
+			self.enterNumber.setStyleSheet('border : 2px solid red; background-color : white')
+			self.enterNumber.setPlaceholderText('!!INCORRECT NUMBER!!')
+			check1 = False
+		if len(timeText) != 5 or timeText[2] != ':' or type(timeTextInt) == str:
+			self.time.setText('')
+			self.time.setStyleSheet('border : 2px solid red; background-color : white')
+			self.time.setPlaceholderText('!!INCORRECT TIME!!')
+			check1 = False
+		if not self.__checkbox1.isChecked()	and not self.__checkbox2.isChecked() and not self.__checkbox3.isChecked() and not self.__checkbox4.isChecked() and not self.__checkbox5.isChecked()	and not self.__checkbox6.isChecked():
+			self.__checkboxLabel.setStyleSheet('color : red; font-size : 20px')
+			check1 = False
+
+		#si cumple el checkeo pasamos a mostrar el codigo qr
+		if check1:
+			self.__QRcode()	
+
+
+
 
 
 def restoreInfo() -> bool:
