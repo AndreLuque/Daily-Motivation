@@ -1,2 +1,2 @@
 # Daily-Motivation
-Programa que manda frases motivacionales/de inspiración todos los días al usuario de la categoría que elija, por ejemplo, vida, deporte, amor, etc.
+Program that sends inspirational/motivational quotes to the user via WhatsApp from various categories depending on preference: Sports, Love, Life, etc.
