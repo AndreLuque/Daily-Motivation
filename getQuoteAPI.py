@@ -1,10 +1,12 @@
 import requests
 from typing import NoReturn, TypeVar, List
+import time
+import datetime
 
 
-def getQuote():
+def getQuote(category: str) -> (str, str):
 	#primero hacemos un request al API
-	response = requests.get('https://quotes.rest/qod?category=sports&language=en')
+	response = requests.get(f'https://quotes.rest/qod?category={category}&language=en')
 	#la respuesta volvera en json por lo que lo formatamos asi
 	response_JSON = response.json()
 	#si hay un error en el request si lanzara una excepcion
@@ -12,5 +14,8 @@ def getQuote():
 		raise ValueError
 	#sino cogemos el quote con su autor, fecha, etc.
 	else:
-		quote = response.json()['contents']['quotes'][0]['quote']
+		#obtenemos la frase y el autor
+		quote = response_JSON['contents']['quotes'][0]['quote']
+		author = response_JSON['contents']['quotes'][0]['author']
+		return quote, author
 
