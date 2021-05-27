@@ -7,7 +7,7 @@ from PyQt5.QtGui import QFont, QPixmap
 from PyQt5 import QtCore
 import pickle
 from typing import List, TypeVar, NoReturn
-import datetime
+from datetime import datetime, date
 
 T = TypeVar('T')
 
@@ -24,7 +24,50 @@ class MainWindow(QMainWindow):
 			comboBox.addItem(str(element))	
 
 	def __QRcode(self):
-		pass	
+		#como se dsitrubuira la informacion
+		layout = QVBoxLayout()
+
+		#ponemos el primer mensaje
+		message1 = QLabel('Scan the QR Code')
+		message1.setStyleSheet('font-size : 40px; font-weight : bold; color: white')
+		message1.setAlignment(QtCore.Qt.AlignCenter)
+		layout.addWidget(message1)
+
+		#ponemos la imagen del codigo qr
+		qrImage = QLabel()
+		qrImage.setStyleSheet('image : url(QRcode.png)')
+		#qrImage.setFixedHeight(200)
+		#qrImage.setFixedWidth(200)
+		layout.addWidget(qrImage)
+
+		#ponemos el segundo mensaje
+		message2 = QLabel('and send the message that appears!')
+		message2.setStyleSheet('font-size : 40px; font-weight : bold; color: white')
+		message2.setAlignment(QtCore.Qt.AlignCenter)
+		layout.addWidget(message2)
+
+		#ponemos un boton para probar el numero
+		testButton = QPushButton('Test')
+		testButton.setStyleSheet('background-color : darkblue; color : white')
+		layout.addWidget(testButton)
+
+		centralWidget = QWidget()
+		centralWidget.setStyleSheet('background-color : blue')
+		centralWidget.setLayout(layout)
+		self.setCentralWidget(centralWidget)
+
+		#cuando el boton sea pulsado de conectara a esta funcion
+		testButton.clicked.connect(lambda: self.__test_number())
+
+	def __test_number(self):
+		try:
+			sendMessageTwilio('SUCCESS! You have joined Daily Motivation. (Respond to messages to keep recieving Daily Quotes)', self.numberText)
+			self.close()
+		except:
+			self.__change_to_start_screen()
+			self.__enterNumber.setText('')
+			self.__enterNumber.setStyleSheet('border : 2px solid red; background-color : white')
+			self.__enterNumber.setPlaceholderText('!!INCORRECT NUMBER!!')		
 
 	def __home_screen(self):
 		self.setWindowTitle('DAILY MOTIVATION')	
@@ -64,15 +107,15 @@ class MainWindow(QMainWindow):
 		layout.addWidget(title)
 				
 		#dejamos un hueco para introducir el numero
-		self.enterNumber = QLineEdit(placeholderText = 'Enter Whatsapp Phone Number (Example: +34633890056)')
-		self.enterNumber.setStyleSheet('background-color : white; color : black')
-		layout.addWidget(self.enterNumber)
+		self.__enterNumber = QLineEdit(placeholderText = 'Enter Whatsapp Phone Number (Example: +34633890056)')
+		self.__enterNumber.setStyleSheet('background-color : white; color : black')
+		layout.addWidget(self.__enterNumber)
 
 		#dejamos un hueco para introducir la hora
-		self.time = QLineEdit(placeholderText = 'At what time do you want to recieve the quotes? (Example: 12:42)')
-		self.time.setStyleSheet('background-color : white; color : black')
-		self.time.setMaxLength(5)
-		layout.addWidget(self.time)
+		self.__time = QLineEdit(placeholderText = 'At what time do you want to recieve the quotes? (Example: 12:42)')
+		self.__time.setStyleSheet('background-color : white; color : black')
+		self.__time.setMaxLength(5)
+		layout.addWidget(self.__time)
 
 		self.__checkboxLabel = QLabel('Select Categories that you are interested in:')
 		self.__checkboxLabel.setStyleSheet('color : white; font-size : 20px')
@@ -81,7 +124,7 @@ class MainWindow(QMainWindow):
 		sublayout1 = QHBoxLayout()
 
 		#el usuario pulsara en las cajas que cumple su preferencia
-		self.__checkbox1 = QCheckBox('Inspirational')
+		self.__checkbox1 = QCheckBox('Inspire')
 		self.__checkbox1.setStyleSheet('color : white')
 		sublayout1.addWidget(self.__checkbox1)
 		self.__checkbox2 = QCheckBox('Sports')
@@ -127,30 +170,30 @@ class MainWindow(QMainWindow):
 		continueButton.clicked.connect(lambda: self.__check_start_screen())
 
 	def __check_start_screen(self):
-		numberText = self.enterNumber.text()
-		timeText = self.time.text()
+		self.numberText = self.__enterNumber.text()
+		self.timeText = self.__time.text()
 
 		#para ver si lo introducido en la casilla es un telefono
 		try:
-			numberTextInt = int(numberText[1:])
+			numberTextInt = int(self.numberText[1:])
 		except:
-			numberTextInt = numberText[1:]	
+			numberTextInt = self.numberText[1:]	
 		#para ver si la hora es correcta
 		try:
-			timeTextInt = int(timeText[0:2] + timeText[3:])
+			timeTextInt = int(self.timeText[0:2] + self.timeText[3:])
 		except:
-			timeTextInt = timeText[0:2] + timeText[3:]		
+			timeTextInt = self.timeText[0:2] + self.timeText[3:]		
 
 		check1: bool = True
-		if len(numberText) == 0 or numberText[0] != '+' or type(numberTextInt) == str:
-			self.enterNumber.setText('')
-			self.enterNumber.setStyleSheet('border : 2px solid red; background-color : white')
-			self.enterNumber.setPlaceholderText('!!INCORRECT NUMBER!!')
+		if len(self.numberText) == 0 or self.numberText[0] != '+' or type(numberTextInt) == str:
+			self.__enterNumber.setText('')
+			self.__enterNumber.setStyleSheet('border : 2px solid red; background-color : white')
+			self.__enterNumber.setPlaceholderText('!!INCORRECT NUMBER!!')
 			check1 = False
-		if len(timeText) != 5 or timeText[2] != ':' or type(timeTextInt) == str:
-			self.time.setText('')
-			self.time.setStyleSheet('border : 2px solid red; background-color : white')
-			self.time.setPlaceholderText('!!INCORRECT TIME!!')
+		if len(self.timeText) != 5 or self.timeText[2] != ':' or type(timeTextInt) == str:
+			self.__time.setText('')
+			self.__time.setStyleSheet('border : 2px solid red; background-color : white')
+			self.__time.setPlaceholderText('!!INCORRECT TIME!!')
 			check1 = False
 		if not self.__checkbox1.isChecked()	and not self.__checkbox2.isChecked() and not self.__checkbox3.isChecked() and not self.__checkbox4.isChecked() and not self.__checkbox5.isChecked()	and not self.__checkbox6.isChecked():
 			self.__checkboxLabel.setStyleSheet('color : red; font-size : 20px')
@@ -158,11 +201,26 @@ class MainWindow(QMainWindow):
 
 		#si cumple el checkeo pasamos a mostrar el codigo qr
 		if check1:
+			self.listCategories = self.get_categories()
 			self.__QRcode()	
 
+	def get_categories(self) -> List[str]:
+		#esta funcion nos dará todas las categorias elegidas
+		listCategories: List[str] = []
+		if self.__checkbox1.isChecked():
+			listCategories += [self.__checkbox1.text()]
+		if self.__checkbox2.isChecked():
+			listCategories += [self.__checkbox2.text()]
+		if self.__checkbox3.isChecked():
+			listCategories += [self.__checkbox3.text()]
+		if self.__checkbox4.isChecked():
+			listCategories += [self.__checkbox4.text()]
+		if self.__checkbox5.isChecked():
+			listCategories += [self.__checkbox5.text()]
+		if self.__checkbox6.isChecked():
+			listCategories += [self.__checkbox6.text()]		
 
-
-
+		return listCategories			
 
 def restoreInfo() -> bool:
 	#here we must save and restore info of the number, if todays message has already been sent, the date of last logged in  
@@ -193,20 +251,41 @@ def main ():
 		app.exec() #debemos poner el .exec() para que el programa siga hasta que el usuario salga de la ventana 
 
 	stay: bool = True
+	#primero cogemos la fecha de cuando se inicio la aplicacion
+	current_date1 = datetime.date(datetime.now())
+	timeDifference: int = 0
 	while True:
 		t = time.localtime()
 		current_hour = time.strftime("%H", t)
 		current_minute = time.strftime("%M", t)
-		current_date = time.strftime("%d%m%Y", t)
-		if int(current_hour) >= 13  and int(current_minute) >= 53 and stay:
+		current_date2 = datetime.date(datetime.now())
+		#si coincide con el horario elegido por el usuario, mandaremos el quote
+		if int(current_hour) == int(window1.timeText[0:2])  and int(current_minute) == int(window1.timeText[3:]) and stay:
 			stay = False
-			print('sent message')
+			#primero obtenemos las categorias
+			listQuotes: List[(str, str)] = []
+			for category in window1.listCategories:
+				quote, author = getQuote(category.lower())
+				if quote != '':
+					listQuotes += [(category, quote, author)]
+			#mandamos un mensaje separado para cada quote		
+			for message in listQuotes:
+				sendMessageTwilio('-' + message[0] + '-' + '\n' + message[2] + ':' + '\n' + message[1], window1.numberText)
+			if len(listQuotes) != 0:
+				sendMessageTwilio('!!!Respond to message to keep recieving quotes daily!!!', window1.numberText)	
 
-		time.sleep(5)
-		#if not stay:
-		#	time.sleep(82800)
-		#else:
-		#	time.sleep(29)
+		#cada tres dias el usuario tiene que mandar un mensaje para renovar la suscripcion
+		if timeDifference != (current_date1 - current_date2).days:
+			timeDifference = (current_date1 - current_date2).days
+			if timeDifference % 3 == 0 and timeDifference != 0:
+				sendMessageTwilio("Send the message 'join invented-outer' to renew your quote subscription", window1.numberText)
+
+		#time.sleep(5)
+		if not stay:
+			time.sleep(3600)
+			stay = True
+		else:
+			time.sleep(29)
 
 
 if __name__ == '__main__': main()

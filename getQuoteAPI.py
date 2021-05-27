@@ -11,11 +11,13 @@ def getQuote(category: str) -> (str, str):
 	response_JSON = response.json()
 	#si hay un error en el request si lanzara una excepcion
 	if 'error' in response_JSON.keys():
-		raise ValueError
+		return '', ''
 	#sino cogemos el quote con su autor, fecha, etc.
 	else:
 		#obtenemos la frase y el autor
 		quote = response_JSON['contents']['quotes'][0]['quote']
 		author = response_JSON['contents']['quotes'][0]['author']
 		return quote, author
+
+
 
