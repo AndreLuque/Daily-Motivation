@@ -1,1 +1,1 @@
-worker: python getQuoteAPI.py
+worker: python mainAppTest.py
