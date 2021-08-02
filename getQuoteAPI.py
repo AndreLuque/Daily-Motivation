@@ -3,6 +3,7 @@ from typing import NoReturn, TypeVar, List
 import time
 import datetime
 
+print('Hola como estais')
 
 def getQuote(category: str) -> (str, str):
 	#primero hacemos un request al API
