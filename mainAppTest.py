@@ -17,7 +17,7 @@ def main ():
 		current_minute = time.strftime("%M", t)
 		current_date2 = datetime.date(datetime.now())
 		#si coincide con el horario elegido por el usuario, mandaremos el quote
-		if int(current_hour) == 15  and int(current_minute) == 42 and stay:
+		if int(current_hour) == 20  and int(current_minute) == 1 and stay:
 			stay = False
 			#primero obtenemos las categorias
 			listQuotes: List[(str, str)] = []
