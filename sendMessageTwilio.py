@@ -1,5 +1,6 @@
 from twilio.rest import Client
 from typing import List, NoReturn, TypeVar
+import os
 
 T = TypeVar('T')
 
@@ -7,7 +8,8 @@ def sendMessageTwilio(text: T, user_number: str) -> NoReturn:
 
 	#primero inicializamos nuestros credenciales
 	account_sid = 'AC79f4fb318d07f76a17b23a56573bd04a' 
-	auth_token = 'fb508dbb3bab406b6ef9819d0e00026c'
+	auth_token = os.environ.get("TWILIO_API_KEY")
+
 	#creamos el cliente 
 	client: Client = Client(account_sid, auth_token)
 
